@@ -1,0 +1,85 @@
+
+ ProjectSettings
+ Assets
+ Assets Lighting
+ Assets Lighting 2D_Lights
+ Assets Lighting Light_Presets
+ Assets Localization
+ Assets Localization Languages
+ Assets Localization Fonts
+ Assets Scenes
+ Assets Scenes TestScenes
+ Assets Scenes Cinematics
+ Assets Scenes MainMenu
+ Assets Scenes Levels
+ Assets ThirdParty
+ Assets ThirdParty AssetStore
+ Assets Audio
+ Assets Audio Music
+ Assets Audio Music Menu
+ Assets Audio Music Cinematics
+ Assets Audio Music Gameplay
+ Assets Audio SFX
+ Assets Audio SFX Environment
+ Assets Audio SFX Enemies
+ Assets Audio SFX Player
+ Assets Audio SFX UI
+ Assets Audio Voice
+ Assets Scripts
+ Assets Scripts Managers
+ Assets Scripts Camera
+ Assets Scripts Level
+ Assets Scripts IAP
+ Assets Scripts Localization
+ Assets Scripts Enemies
+ Assets Scripts Ads
+ Assets Scripts Player
+ Assets Scripts Analytics
+ Assets Scripts UI
+ Assets Scripts Collectibles
+ Assets Art
+ Assets Art Characters
+ Assets Art Characters Enemies
+ Assets Art Characters Player
+ Assets Art Characters NPCs
+ Assets Art Environments
+ Assets Art Environments Midgrounds
+ Assets Art Environments Backgrounds
+ Assets Art Environments Props
+ Assets Art Environments Parallax_Layers
+ Assets Art Environments Foregrounds
+ Assets Art VFX
+ Assets Art VFX Sprites
+ Assets Art VFX Particles
+ Assets Art UI
+ Assets Art UI Buttons
+ Assets Art UI Icons
+ Assets Art UI HUD
+ Assets Art UI Panels
+ Assets Art Animations
+ Assets Materials
+ Assets Materials Lighting
+ Assets Materials Sprites
+ Assets Data
+ Assets Data LevelData
+ Assets Data EnemyData
+ Assets Data PlayerData
+ Assets Data CollectibleData
+ Assets Plugins
+ Assets Plugins IAP
+ Assets Plugins Ads
+ Assets Plugins Analytics
+ Assets Plugins Android
+ Assets Prefabs
+ Assets Prefabs Environment
+ Assets Prefabs Enemies
+ Assets Prefabs Player
+ Assets Prefabs VFX
+ Assets Prefabs UI
+ Assets Prefabs Collectibles
+ Assets Animations
+ Assets Animations Environment
+ Assets Animations Enemies
+ Assets Animations Player
+ Assets Animations UI
+ Documentation
