@@ -1,0 +1,2098 @@
+================================================================================
+        A PEDESTRIAN'S JOURNEY - COMPLETE GAME DEVELOPMENT PLAN
+================================================================================
+          2D Platformer with 3D Visual Effects (Oddmar/Leo's Fortune Style)
+                              Unity Personal Edition
+================================================================================
+
+PROJECT OVERVIEW:
+-----------------
+Game Name: A Pedestrian's Journey
+Genre: 2D Platformer with depth effects (parallax, 2D lighting)
+Platform: Android
+Engine: Unity Personal
+Art Style: 2D sprites with 3D-like depth and lighting
+Target: Solo developer project
+
+================================================================================
+                              PHASE 1: PROJECT SETUP
+================================================================================
+
+[ ] 1.1 - UNITY INSTALLATION
+    - Download Unity Hub from unity.com
+    - Install Unity LTS version (2022.3 LTS recommended)
+    - Select Android Build Support during installation
+    - Include Android SDK, NDK, and JDK modules
+    - Install Visual Studio or VS Code for scripting
+
+[ ] 1.2 - CREATE NEW PROJECT
+    - Open Unity Hub
+    - Click "New Project"
+    - Select "2D (URP)" template (Universal Render Pipeline)
+    - Name: "A_Pedestrians_Journey"
+    - Location: Choose your project directory
+    - Create Project
+
+[ ] 1.3 - IMPORT ESSENTIAL PACKAGES
+    Go to Window > Package Manager and install:
+    - 2D Animation (for sprite rigging and animation)
+    - 2D Pixel Perfect (for crisp sprite rendering)
+    - 2D PSD Importer (if using Photoshop files)
+    - 2D Sprite Shape (for organic terrain)
+    - 2D Tilemap Editor (for level design)
+    - Cinemachine (for advanced camera control)
+    - TextMeshPro (for UI text - will auto-import)
+    - Input System (modern input handling)
+    - Universal RP (should be included with template)
+    - Localization (for multi-language support)
+
+[ ] 1.4 - PROJECT SETTINGS CONFIGURATION
+    Edit > Project Settings:
+    
+    PLAYER SETTINGS:
+    - Company Name: Your name/studio
+    - Product Name: A Pedestrian's Journey
+    - Default Icon: (add later)
+    - Resolution:
+      * Default Orientation: Landscape Left
+      * Aspect Ratio: 16:9
+      * Resolution Scaling: Fixed DPI
+    
+    QUALITY SETTINGS:
+    - Set default quality to Medium for Android
+    - Enable Anti-Aliasing: 2x Multi Sampling
+    - VSync Count: Every V Blank
+    
+    PHYSICS 2D:
+    - Gravity: X=0, Y=-9.81 (adjust later for game feel)
+    - Default Contact Offset: 0.01
+    - Velocity Threshold: 1
+    
+    TAGS:
+    Add these tags:
+    - Player
+    - Enemy
+    - Ground
+    - Platform
+    - Collectible
+    - Hazard
+    - Checkpoint
+    - Interactable
+    
+    LAYERS:
+    Add these layers:
+    - Player (Layer 6)
+    - Enemy (Layer 7)
+    - Ground (Layer 8)
+    - Platform (Layer 9)
+    - Collectible (Layer 10)
+    - Background (Layer 11)
+    - Foreground (Layer 12)
+    - UI (Layer 5 - built-in)
+
+[ ] 1.5 - SORTING LAYERS SETUP
+    Edit > Project Settings > Tags and Layers > Sorting Layers:
+    - Background_Far (Order: -500)
+    - Background_Mid (Order: -300)
+    - Background_Near (Order: -100)
+    - Environment (Order: 0)
+    - Collectibles (Order: 50)
+    - Player (Order: 100)
+    - Enemies (Order: 100)
+    - Foreground_Near (Order: 200)
+    - Foreground_Far (Order: 300)
+    - UI (Order: 500)
+
+[ ] 1.6 - INPUT SYSTEM SETUP
+    - Window > Package Manager > Input System > Install
+    - Edit > Project Settings > Player > Active Input Handling: Both
+    - Create Input Actions Asset:
+      * Assets > Create > Input Actions
+      * Name it "PlayerInputActions"
+      * Save in: Assets/Scripts/Player/
+
+[ ] 1.7 - FOLDER STRUCTURE VERIFICATION
+    - Verify all folders were created in Assets directory
+    - Copy this project folder into Unity's Assets folder location
+    - Unity will recognize and import the structure automatically
+
+[ ] 1.8 - URP RENDERER SETUP FOR 2D LIGHTING
+    - Assets > Create > Rendering > URP Asset (with 2D Renderer)
+    - Name: "2D_URP_Renderer"
+    - Edit > Project Settings > Graphics:
+      * Set Scriptable Render Pipeline Settings to your URP Asset
+    - In URP Asset Inspector:
+      * Post Processing: Enabled
+      * HDR: Enabled
+      * MSAA: 4x
+    - In 2D Renderer:
+      * Enable Transparency Sort Mode: Custom Axis (0, 1, 0)
+
+================================================================================
+                        PHASE 2: CORE PLAYER MECHANICS
+================================================================================
+
+[ ] 2.1 - PLAYER SPRITE SETUP
+    - Import player sprite sheet to: Assets/Art/Characters/Player/
+    - Select sprite in Inspector:
+      * Texture Type: Sprite (2D and UI)
+      * Sprite Mode: Multiple
+      * Pixels Per Unit: 100 (adjust based on your art)
+      * Filter Mode: Point (for pixel art) or Bilinear (for smooth)
+      * Compression: None or Low Quality
+      * Max Size: 2048
+    - Click "Sprite Editor" button
+    - Slice sprites (Automatic or Grid)
+    - Apply changes
+
+[ ] 2.2 - CREATE PLAYER GAME OBJECT
+    - Hierarchy > Right-click > 2D Object > Sprite
+    - Rename to "Player"
+    - Assign idle sprite from player sprite sheet
+    - Position at (0, 0, 0)
+    - Add Components:
+      * Rigidbody2D:
+        - Body Type: Dynamic
+        - Mass: 1
+        - Linear Drag: 0
+        - Angular Drag: 0.05
+        - Gravity Scale: 3 (adjust for feel)
+        - Collision Detection: Continuous
+        - Constraints: Freeze Rotation Z
+      
+      * Capsule Collider 2D:
+        - Size: Adjust to fit sprite
+        - Offset: Adjust if needed
+      
+      * Animator:
+        - Will setup controller later
+
+[ ] 2.3 - PLAYER MOVEMENT SCRIPT
+    Create: Assets/Scripts/Player/PlayerController.cs
+    
+    Required functionality:
+    - Horizontal movement (walk/run)
+    - Jump mechanics (ground detection)
+    - Variable jump height
+    - Air control
+    - Max speed limiting
+    - Ground check (raycast or overlap circle)
+    - Coyote time (grace period after leaving ground)
+    - Jump buffering (press jump slightly before landing)
+    
+    Key variables:
+    - moveSpeed (default: 5-8f)
+    - jumpForce (default: 12-15f)
+    - maxSpeed (default: 10f)
+    - groundCheckRadius (default: 0.2f)
+    - groundCheckOffset (default: Vector2.down * 0.5f)
+    - coyoteTime (default: 0.1f)
+    - jumpBufferTime (default: 0.1f)
+
+[ ] 2.4 - INPUT SYSTEM IMPLEMENTATION
+    - Open PlayerInputActions asset
+    - Create Action Map: "Gameplay"
+    - Add Actions:
+      * Move (Value, Vector2, Keyboard WASD/Arrows, Touch)
+      * Jump (Button, Space, Touch)
+      * Interact (Button, E, Touch)
+      * Pause (Button, Escape)
+    - Generate C# Class
+    - Reference in PlayerController script
+    - Enable input in OnEnable(), disable in OnDisable()
+
+[ ] 2.5 - GROUND DETECTION SYSTEM
+    Create: Assets/Scripts/Player/GroundCheck.cs
+    
+    Methods:
+    - Physics2D.OverlapCircle for ground detection
+    - Use LayerMask for ground layers only
+    - Visualize with Gizmos in Scene view
+    - Return bool IsGrounded()
+    
+    Alternative: Use raycasts from player corners
+
+[ ] 2.6 - PLAYER ANIMATION SETUP
+    - Create Animator Controller:
+      * Assets/Animations/Player/PlayerAnimator.controller
+    - Attach to Player GameObject
+    - Import/Create animation clips:
+      * Idle
+      * Walk/Run
+      * Jump (start)
+      * Jump (air)
+      * Fall
+      * Land
+      * Death
+    
+    Animation States and Transitions:
+    - Create parameters: Speed (Float), IsGrounded (Bool), VerticalVelocity (Float)
+    - Idle <-> Walk (Speed > 0.1)
+    - Any -> Jump (Jump trigger)
+    - Jump -> Fall (VerticalVelocity < 0)
+    - Fall -> Land (IsGrounded = true)
+    - Land -> Idle (automatic after animation)
+
+[ ] 2.7 - SPRITE FLIPPING
+    In PlayerController.cs:
+    - Check horizontal input direction
+    - Flip sprite by scaling: transform.localScale = new Vector3(direction, 1, 1)
+    - Or use SpriteRenderer.flipX
+    - Ensure facing direction is correct for animations
+
+[ ] 2.8 - PLAYER STATE MACHINE (Optional but recommended)
+    Create: Assets/Scripts/Player/PlayerStateMachine.cs
+    
+    States:
+    - IdleState
+    - WalkState
+    - JumpState
+    - FallState
+    - LandState
+    
+    Each state has:
+    - Enter()
+    - Update()
+    - Exit()
+    
+    Cleaner code organization for complex behaviors
+
+[ ] 2.9 - PLAYER HEALTH SYSTEM
+    Create: Assets/Scripts/Player/PlayerHealth.cs
+    
+    Variables:
+    - maxHealth (default: 100)
+    - currentHealth
+    - invulnerabilityTime (default: 1f after damage)
+    - isInvulnerable (bool)
+    
+    Methods:
+    - TakeDamage(int amount)
+    - Heal(int amount)
+    - Die()
+    - StartInvulnerability()
+    
+    Events:
+    - OnHealthChanged (for UI updates)
+    - OnPlayerDeath
+
+[ ] 2.10 - PLAYER RESPAWN SYSTEM
+    Create: Assets/Scripts/Player/PlayerRespawn.cs
+    
+    - Store last checkpoint position
+    - Respawn delay (1-2 seconds)
+    - Reset player state (health, velocity, etc.)
+    - Fade transition (optional)
+    - Respawn animation/effect
+
+================================================================================
+                          PHASE 3: CAMERA SYSTEM
+================================================================================
+
+[ ] 3.1 - CINEMACHINE VIRTUAL CAMERA SETUP
+    - GameObject > Cinemachine > 2D Camera
+    - Rename to "CM_PlayerFollow"
+    - Set Follow target: Player Transform
+    - Body: Framing Transposer
+      * Lookahead Time: 0.2-0.5
+      * Lookahead Smoothing: 10
+      * Damping: Adjust for smooth follow (X: 1, Y: 1)
+      * Screen X/Y: 0.5 (center)
+      * Dead Zone Width/Height: 0.1-0.2
+
+[ ] 3.2 - CAMERA BOUNDS/CONFINER
+    - Create empty GameObject: "CameraBounds"
+    - Add Polygon Collider 2D (set as trigger)
+    - Edit collider to match level boundaries
+    - In CM_PlayerFollow:
+      * Add CinemachineConfiner2D extension
+      * Assign Polygon Collider 2D as Bounding Shape
+      * Damping: 0.5-1.0
+
+[ ] 3.3 - CAMERA ZONES (for different areas)
+    - Duplicate CM_PlayerFollow for each zone
+    - Adjust priority (higher = active)
+    - Create trigger zones to switch cameras
+    - Script to change camera priority on trigger enter
+
+[ ] 3.4 - CAMERA SHAKE SYSTEM
+    Create: Assets/Scripts/Camera/CameraShake.cs
+    
+    - Use Cinemachine Impulse Source
+    - Trigger on:
+      * Player damage
+      * Enemy defeat
+      * Explosions
+      * Landing from height
+    
+    Variables:
+    - shakeIntensity (0.5-2.0)
+    - shakeDuration (0.1-0.5s)
+    - shakeFrequency (1-3)
+
+[ ] 3.5 - PARALLAX BACKGROUND SCRIPT
+    Create: Assets/Scripts/Camera/ParallaxEffect.cs
+    
+    - Attach to each background layer
+    - Variables:
+      * parallaxMultiplier (0.0 = static, 1.0 = moves with camera)
+      * infiniteHorizontal (bool for wrapping)
+    - Calculate offset based on camera position
+    - Apply to transform.position
+    
+    Layer recommendations:
+    - Far background: 0.1-0.2
+    - Mid background: 0.3-0.5
+    - Near background: 0.6-0.8
+
+[ ] 3.6 - CAMERA LOOK-AHEAD
+    - Already in Cinemachine Framing Transposer
+    - Adjust "Lookahead Time" for prediction
+    - Shows more space in direction of movement
+    - Improves gameplay feel
+
+================================================================================
+                    PHASE 4: LEVEL DESIGN & ENVIRONMENT
+================================================================================
+
+[ ] 4.1 - TILEMAP SETUP
+    - GameObject > 2D Object > Tilemap > Rectangular
+    - Rename Grid to "Level_01"
+    - Rename Tilemap to "Ground"
+    - Add additional Tilemaps as children:
+      * Platforms
+      * Decorations
+      * Collisions (invisible collision map)
+    
+    Set Sorting Layers appropriately
+
+[ ] 4.2 - TILE PALETTE CREATION
+    - Window > 2D > Tile Palette
+    - Create New Palette: "EnvironmentPalette"
+    - Import tileset sprite to Assets/Art/Environments/
+    - Slice tileset in Sprite Editor
+    - Drag sliced sprites into Tile Palette
+    - Unity creates tiles automatically in Assets/Art/Environments/
+
+[ ] 4.3 - PAINTING LEVEL GEOMETRY
+    - Select Tilemap in Hierarchy
+    - Use Tile Palette tools:
+      * Brush: Paint individual tiles
+      * Rectangle: Fill areas
+      * Picker: Sample tiles
+      * Eraser: Remove tiles
+    - Paint ground, platforms, walls
+    - Create interesting level layout
+
+[ ] 4.4 - TILEMAP COLLIDER SETUP
+    - Select Ground Tilemap
+    - Add Component: Tilemap Collider 2D
+    - Add Component: Composite Collider 2D
+    - In Tilemap Collider 2D:
+      * Check "Used By Composite"
+    - In Composite Collider 2D:
+      * Geometry Type: Outlines (for performance)
+      * Check "Used By Effector" (if needed)
+    - Add Rigidbody2D:
+      * Body Type: Static
+    - Set Layer to "Ground"
+
+[ ] 4.5 - ONE-WAY PLATFORMS
+    - Create separate Tilemap: "Platforms_OneWay"
+    - Add Tilemap Collider 2D
+    - Add Platform Effector 2D:
+      * Use One Way: Checked
+      * Surface Arc: 180
+      * Use Side Friction: Unchecked
+      * Use Side Bounce: Unchecked
+    - In Tilemap Collider 2D:
+      * Check "Used By Effector"
+    - Set Layer to "Platform"
+    
+    In Player Physics:
+    - Layer Collision Matrix (Edit > Project Settings > Physics 2D)
+    - Player can collide with Platform layer
+
+[ ] 4.6 - MOVING PLATFORMS
+    Create: Assets/Scripts/Level/MovingPlatform.cs
+    
+    Variables:
+    - waypoints (array of Vector2)
+    - moveSpeed (default: 2f)
+    - waitTime (at each waypoint)
+    - loopType (Loop, PingPong, Once)
+    
+    - Use Vector2.MoveTowards
+    - Parent player to platform when standing on it
+    - Un-parent when player leaves
+
+[ ] 4.7 - HAZARDS (Spikes, Pits, etc.)
+    - Create sprite for hazard
+    - Add Box/Polygon Collider 2D (set as Trigger)
+    - Set Layer/Tag to "Hazard"
+    - Create script: Assets/Scripts/Level/Hazard.cs
+      * OnTriggerEnter2D: Damage player
+      * Damage amount variable
+    - Place throughout level
+
+[ ] 4.8 - BREAKABLE PLATFORMS
+    Create: Assets/Scripts/Level/BreakablePlatform.cs
+    
+    - Timer-based (break after X seconds of standing)
+    - Or health-based (break after X jumps)
+    - Shake animation before breaking
+    - Respawn after time (optional)
+    - Particle effect on break
+
+[ ] 4.9 - BACKGROUND LAYERS
+    - Import background art to Assets/Art/Environments/Backgrounds/
+    - Create empty GameObjects for each layer:
+      * "BG_Sky"
+      * "BG_Mountains"
+      * "BG_Trees"
+      * etc.
+    - Add SpriteRenderer to each
+    - Assign sprites
+    - Set Sorting Layers (Background_Far, Mid, Near)
+    - Attach ParallaxEffect script
+    - Position in Z-space for depth
+
+[ ] 4.10 - FOREGROUND ELEMENTS
+    - Similar to background but in front of player
+    - Use for atmospheric depth:
+      * Leaves
+      * Fog
+      * Light rays
+      * Particles
+    - Set Sorting Layer to Foreground_Near/Far
+    - Adjust alpha for transparency (30-70%)
+
+[ ] 4.11 - ENVIRONMENT PROPS
+    - Trees, rocks, bushes, signs, etc.
+    - Create prefabs in Assets/Prefabs/Environment/
+    - Add sprite renderer
+    - Optional colliders if interactable
+    - Decorate level for visual interest
+
+[ ] 4.12 - LEVEL BOUNDS
+    - Create empty GameObject: "LevelBounds"
+    - Add Box Collider 2D components for:
+      * Left boundary
+      * Right boundary
+      * Bottom (death plane)
+      * Top (optional ceiling)
+    - Script to respawn player if falling out of bounds
+
+================================================================================
+                      PHASE 5: 2D LIGHTING SYSTEM
+================================================================================
+
+[ ] 5.1 - GLOBAL LIGHT SETUP
+    - GameObject > Light > 2D > Global Light 2D
+    - Rename: "GlobalLight"
+    - Color: Daytime blue or warm orange for sunset
+    - Intensity: 0.7-1.0
+    - This provides base lighting for entire scene
+
+[ ] 5.2 - SPRITE NORMAL MAPS (for depth)
+    - Use external tool (Sprite DLight, Laigter) to generate normal maps
+    - Or create manually in Photoshop/GIMP
+    - Import normal map next to sprite
+    - Select sprite in Inspector:
+      * Material: Default-Diffuse (or create 2D Lit material)
+    - Assign normal map in material if needed
+
+[ ] 5.3 - POINT LIGHTS (torches, glows)
+    - GameObject > Light > 2D > Point Light 2D
+    - Place near light sources (torches, lamps, etc.)
+    - Adjust:
+      * Intensity: 1-2
+      * Inner/Outer Radius: Based on light spread
+      * Color: Warm (orange/yellow) or cool (blue/cyan)
+      * Blend Style: Additive or Multiply
+    - Create prefabs for reuse
+
+[ ] 5.4 - SPOT LIGHTS (focused beams)
+    - GameObject > Light > 2D > Spot Light 2D
+    - Use for:
+      * Character highlights
+      * Directional effects
+      * Danger zones
+    - Adjust Inner/Outer Angle
+    - Can animate or move with code
+
+[ ] 5.5 - SHADOW CASTERS
+    - Select objects that should cast shadows
+    - Add Shadow Caster 2D component:
+      * Shape: Composite (for tilemaps) or Custom
+      * Cast Shadows: Enabled
+    - Enable shadows in 2D Renderer settings
+    - Performance cost: Use sparingly
+
+[ ] 5.6 - LIGHT PRESETS
+    Create scriptable objects for different lighting moods:
+    - Assets/Lighting/Light_Presets/
+    - Day, Night, Sunset, Cave, etc.
+    - Store global light color/intensity
+    - Swap during gameplay or between levels
+
+[ ] 5.7 - VOLUMETRIC LIGHTING (God rays, fog)
+    - Use sprite-based light shafts
+    - Add to Foreground layer with additive blend
+    - Animate alpha for pulsing effect
+    - Combine with particles for atmosphere
+
+[ ] 5.8 - EMISSIVE MATERIALS
+    - Create materials for glowing objects
+    - Material > Shader > Universal Render Pipeline > 2D > Sprite-Lit
+    - Adjust Emission color and intensity
+    - Apply to collectibles, hazards, UI elements
+
+================================================================================
+                    PHASE 6: COLLECTIBLES & PICKUPS
+================================================================================
+
+[ ] 6.1 - COIN/GEM SYSTEM
+    Create: Assets/Scripts/Collectibles/Collectible.cs
+    
+    Variables:
+    - collectibleType (enum: Coin, Gem, Health, etc.)
+    - value (points/amount)
+    - collectEffect (particle prefab)
+    - collectSound (audio clip)
+    
+    - OnTriggerEnter2D with Player
+    - Add to player's inventory/score
+    - Play effect and sound
+    - Destroy object
+    - Update UI
+
+[ ] 6.2 - COLLECTIBLE PREFABS
+    - Create prefabs in Assets/Prefabs/Collectibles/
+    - Add SpriteRenderer
+    - Add Circle/Box Collider 2D (Trigger)
+    - Attach Collectible script
+    - Add idle animation (rotate, bob, pulse)
+    - Set Layer to "Collectible"
+
+[ ] 6.3 - COLLECTIBLE MANAGER
+    Create: Assets/Scripts/Managers/CollectibleManager.cs
+    
+    - Track total collectibles in level
+    - Track collected count
+    - Calculate completion percentage
+    - Save/load collected state
+    - Respawn logic (if needed)
+
+[ ] 6.4 - POWER-UPS
+    Create: Assets/Scripts/Collectibles/PowerUp.cs
+    
+    Types:
+    - Speed boost (temporary increased speed)
+    - Jump boost (higher jumps)
+    - Invincibility (temporary immunity)
+    - Double jump (extra jump ability)
+    - Shield (absorb one hit)
+    
+    - Apply effect to player
+    - Duration timer
+    - Visual indicator (particle, glow, color change)
+    - UI icon showing active power-up
+
+[ ] 6.5 - HEALTH PICKUPS
+    - Heart sprites
+    - Heal player on collection
+    - Small heal (25 HP) vs Full heal (100 HP)
+    - Rare placement in levels
+
+[ ] 6.6 - CHECKPOINT SYSTEM
+    Create: Assets/Scripts/Level/Checkpoint.cs
+    
+    - Flag or marker sprite
+    - OnTriggerEnter2D with Player
+    - Save checkpoint position
+    - Visual feedback (raise flag, light up)
+    - Play sound
+    - Save to PlayerPrefs or save system
+    - Respawn player here on death
+
+================================================================================
+                        PHASE 7: ENEMY SYSTEM
+================================================================================
+
+[ ] 7.1 - BASIC ENEMY SETUP
+    - Import enemy sprites to Assets/Art/Characters/Enemies/
+    - Create enemy GameObject
+    - Add SpriteRenderer, Rigidbody2D, Collider2D
+    - Rigidbody2D settings:
+      * Body Type: Dynamic
+      * Gravity Scale: 3
+      * Freeze Rotation Z
+    - Set Layer to "Enemy"
+
+[ ] 7.2 - ENEMY BASE CLASS
+    Create: Assets/Scripts/Enemies/EnemyBase.cs
+    
+    Variables:
+    - maxHealth
+    - currentHealth
+    - moveSpeed
+    - damage
+    - scoreValue
+    - deathEffect (particle)
+    - deathSound
+    
+    Methods:
+    - TakeDamage(int amount)
+    - Die()
+    - OnCollisionWithPlayer()
+    - virtual Move() (override in specific enemies)
+    - virtual Attack() (override in specific enemies)
+
+[ ] 7.3 - PATROL ENEMY
+    Create: Assets/Scripts/Enemies/PatrolEnemy.cs (inherits EnemyBase)
+    
+    - Patrol between two points
+    - Walk back and forth
+    - Turn at edges or walls (raycast detection)
+    - Chase player if in range (optional)
+    - Return to patrol if player leaves range
+
+[ ] 7.4 - FLYING ENEMY
+    Create: Assets/Scripts/Enemies/FlyingEnemy.cs
+    
+    - Sine wave movement pattern
+    - Or circular patrol around point
+    - No gravity (Gravity Scale: 0)
+    - Shoot projectiles (optional)
+
+[ ] 7.5 - JUMPING ENEMY
+    Create: Assets/Scripts/Enemies/JumpingEnemy.cs
+    
+    - Periodically jump in place
+    - Or jump toward player
+    - Dangerous on contact
+    - Vulnerable when landing
+
+[ ] 7.6 - ENEMY DAMAGE DEALING
+    In EnemyBase.cs:
+    - OnCollisionEnter2D with Player
+    - Call PlayerHealth.TakeDamage()
+    - Apply knockback to player
+    - Optional: Destroy enemy on contact (like Goomba)
+    - Or persistent enemy (like Koopa)
+
+[ ] 7.7 - ENEMY DEFEAT MECHANIC
+    - Jump on top: Check collision normal or player velocity
+    - If player lands on enemy (Y velocity < 0, collision from above):
+      * Enemy takes damage or dies
+      * Player bounces up
+      * Award points
+    - Projectile damage (if implementing shooting)
+
+[ ] 7.8 - ENEMY ANIMATIONS
+    - Idle, Walk, Attack, Hurt, Death
+    - Setup Animator Controller for each enemy type
+    - Similar to player animation setup
+    - Trigger animations based on state
+
+[ ] 7.9 - ENEMY SPAWNER (Optional)
+    Create: Assets/Scripts/Enemies/EnemySpawner.cs
+    
+    - Spawn enemies at intervals
+    - Max enemy count
+    - Spawn different enemy types
+    - Used for arena or survival sections
+
+[ ] 7.10 - ENEMY AI STATES
+    Create state machine for complex enemies:
+    - Idle
+    - Patrol
+    - Chase
+    - Attack
+    - Hurt
+    - Death
+    
+    Cleaner organization for advanced behaviors
+
+================================================================================
+                        PHASE 8: COMBAT SYSTEM
+================================================================================
+
+[ ] 8.1 - PLAYER ATTACK (MELEE)
+    In PlayerController or new PlayerCombat.cs:
+    
+    - Input for attack (mouse click or button)
+    - Attack animation
+    - Create attack hitbox:
+      * Child GameObject with trigger collider
+      * Enable only during attack frames
+    - Check for enemies in hitbox
+    - Apply damage to enemies
+    - Attack cooldown
+
+[ ] 8.2 - PLAYER ATTACK (RANGED)
+    Create: Assets/Scripts/Player/PlayerShooting.cs
+    
+    - Projectile prefab
+    - Spawn projectile on input
+    - Projectile script:
+      * Move forward
+      * Damage on contact
+      * Destroy after time or distance
+      * Destroy on wall collision
+    - Ammo system (optional)
+    - Shooting animation
+
+[ ] 8.3 - COMBO SYSTEM (Optional)
+    - Track consecutive attacks
+    - Different attack animations based on combo count
+    - Combo timer (reset if too slow)
+    - Higher damage on combo finisher
+
+[ ] 8.4 - WEAPON SYSTEM (Optional)
+    Create: Assets/Scripts/Player/WeaponManager.cs
+    
+    - Different weapon types (sword, bow, hammer)
+    - Weapon switching
+    - Each weapon has:
+      * Damage
+      * Attack speed
+      * Range
+      * Special ability
+    - ScriptableObjects for weapon data
+
+[ ] 8.5 - DAMAGE NUMBERS (Visual feedback)
+    Create: Assets/Scripts/UI/DamageNumber.cs
+    
+    - Instantiate text on damage
+    - Float upward with animation
+    - Fade out
+    - Different colors for player vs enemy damage
+    - World space canvas
+
+[ ] 8.6 - HIT EFFECTS
+    - Particle systems on hit
+    - Screen shake on heavy hits
+    - Flash sprite white briefly
+    - Hitstop/freeze frame (pause for 1-2 frames)
+    - Sound effects
+
+[ ] 8.7 - KNOCKBACK SYSTEM
+    - Apply force away from attacker
+    - Temporary loss of player control
+    - Prevent immediate re-damage (invulnerability frames)
+    - Can knock enemies off platforms
+
+================================================================================
+                        PHASE 9: USER INTERFACE
+================================================================================
+
+[ ] 9.1 - UI CANVAS SETUP
+    - GameObject > UI > Canvas
+    - Canvas Scaler:
+      * UI Scale Mode: Scale With Screen Size
+      * Reference Resolution: 1920x1080
+      * Match: 0.5 (balance width/height)
+    - Create UI folders structure:
+      * HUD (in-game UI)
+      * MainMenu
+      * PauseMenu
+      * SettingsMenu
+      * LevelSelect
+
+[ ] 9.2 - HEALTH BAR (HUD)
+    - Create Image: Health bar background
+    - Create Image: Health bar fill (red/green)
+    - Fill Type: Filled > Horizontal
+    - Script: Update fill amount based on player health
+    - Add to top-left corner
+    - Can use hearts instead of bar
+
+[ ] 9.3 - SCORE/COIN COUNTER (HUD)
+    - TextMeshPro for score display
+    - Icon sprite for coin
+    - Update on collectible pickup
+    - Animate on change (scale pulse)
+    - Top-right corner
+
+[ ] 9.4 - PAUSE MENU
+    Create: Assets/Scripts/UI/PauseMenu.cs
+    
+    - Input for pause (Escape or button)
+    - Time.timeScale = 0 (pause game)
+    - Show panel with buttons:
+      * Resume
+      * Restart Level
+      * Settings
+      * Main Menu
+    - Blur background (optional)
+
+[ ] 9.5 - MAIN MENU
+    Create: Assets/Scenes/MainMenu/MainMenu.unity
+    
+    UI Elements:
+    - Game logo
+    - Buttons:
+      * Play (load level select or first level)
+      * Settings
+      * Credits
+      * Quit (Application.Quit)
+    - Background image or animated scene
+    - Music
+
+[ ] 9.6 - SETTINGS MENU
+    Create: Assets/Scripts/UI/SettingsMenu.cs
+    
+    Options:
+    - Master volume slider
+    - Music volume slider
+    - SFX volume slider
+    - Language dropdown (for localization)
+    - Graphics quality dropdown
+    - Apply/Cancel buttons
+    - Save settings to PlayerPrefs
+
+[ ] 9.7 - LEVEL SELECT SCREEN
+    - Grid of level buttons
+    - Show level number/name
+    - Lock/unlock status (based on completion)
+    - Star rating (optional completion metric)
+    - Scroll view if many levels
+    - Load selected level on click
+
+[ ] 9.8 - LEVEL COMPLETE SCREEN
+    - Show on level finish
+    - Display:
+      * Level time
+      * Collectibles found
+      * Star rating
+      * Score
+    - Buttons:
+      * Next Level
+      * Retry
+      * Level Select
+    - Award stars based on performance
+
+[ ] 9.9 - GAME OVER SCREEN
+    - Show on player death (after lives depleted)
+    - Final score
+    - Buttons:
+      * Retry
+      * Level Select
+      * Main Menu
+
+[ ] 9.10 - TUTORIAL/HINT SYSTEM
+    Create: Assets/Scripts/UI/TutorialManager.cs
+    
+    - Pop-up hints on first encounter
+    - Button prompts (press X to jump)
+    - Arrow indicators
+    - Can be dismissed
+    - Save which tutorials have been shown
+
+[ ] 9.11 - LOADING SCREEN
+    - Progress bar
+    - Loading tips text
+    - AsyncOperation for scene loading
+    - Smooth transition
+
+[ ] 9.12 - MOBILE TOUCH CONTROLS (Android)
+    - Virtual joystick for movement
+    - Jump button (right side)
+    - Attack button (if applicable)
+    - Transparent but visible
+    - Position in safe area
+    - Use Unity's Input System for touch
+
+================================================================================
+                        PHASE 10: AUDIO SYSTEM
+================================================================================
+
+[ ] 10.1 - AUDIO MANAGER SETUP
+    Create: Assets/Scripts/Managers/AudioManager.cs
+    
+    Singleton pattern:
+    - Persistent across scenes (DontDestroyOnLoad)
+    - Functions:
+      * PlayMusic(AudioClip clip)
+      * PlaySFX(AudioClip clip)
+      * StopMusic()
+      * SetMasterVolume(float volume)
+      * SetMusicVolume(float volume)
+      * SetSFXVolume(float volume)
+
+[ ] 10.2 - AUDIO SOURCES
+    In AudioManager GameObject:
+    - Add AudioSource for Music
+      * Loop: Enabled
+      * Priority: 0 (highest)
+    - Add AudioSource for SFX
+      * Loop: Disabled
+      * Priority: 128
+    - Can pool multiple SFX sources for simultaneous sounds
+
+[ ] 10.3 - MUSIC IMPLEMENTATION
+    Import music to Assets/Audio/Music/:
+    - Main menu theme
+    - Gameplay theme (per world/level)
+    - Boss theme
+    - Victory theme
+    - Game over theme
+    
+    Audio Clip Import Settings:
+    - Load Type: Streaming (for long music)
+    - Compression Format: Vorbis
+    - Quality: 70-100%
+
+[ ] 10.4 - SOUND EFFECTS IMPLEMENTATION
+    Import SFX to Assets/Audio/SFX/:
+    
+    Player SFX:
+    - Jump
+    - Land
+    - Footsteps (walk/run)
+    - Take damage
+    - Death
+    - Attack
+    - Collect item
+    
+    Enemy SFX:
+    - Alert/Aggro
+    - Attack
+    - Hurt
+    - Death
+    
+    Environment SFX:
+    - Door open/close
+    - Platform move
+    - Breakable object
+    - Hazard (fire, spikes)
+    - Water splash
+    
+    UI SFX:
+    - Button hover
+    - Button click
+    - Menu open/close
+    - Pause
+    
+    Audio Clip Import Settings:
+    - Load Type: Decompress On Load (for short SFX)
+    - Compression Format: PCM (quality) or ADPCM (balance)
+
+[ ] 10.5 - AUDIO MIXING
+    - Window > Audio > Audio Mixer
+    - Create mixer: "MainAudioMixer"
+    - Groups:
+      * Master
+        - Music
+        - SFX
+          * Player
+          * Enemies
+          * Environment
+          * UI
+    - Adjust volumes per group
+    - Add effects (reverb for caves, etc.)
+    - Expose volume parameters for settings menu
+
+[ ] 10.6 - ADAPTIVE MUSIC (Optional)
+    - Change music intensity based on gameplay
+    - Layer tracks (add drums in combat)
+    - Smooth transitions between tracks
+    - Use coroutines for crossfade
+
+[ ] 10.7 - SPATIAL AUDIO (3D Audio)
+    - Enable 3D sound for environment sources
+    - Set Min/Max distance
+    - Doppler effect for moving objects
+    - Reverb zones for different areas
+
+[ ] 10.8 - AUDIO POOLING
+    For frequent SFX (footsteps, bullets):
+    - Create pool of AudioSources
+    - Reuse instead of creating new
+    - Improves performance
+
+================================================================================
+                    PHASE 11: VISUAL EFFECTS (VFX)
+================================================================================
+
+[ ] 11.1 - PARTICLE SYSTEM BASICS
+    - GameObject > Effects > Particle System
+    - Main modules to adjust:
+      * Duration
+      * Start Lifetime
+      * Start Speed
+      * Start Size
+      * Start Color
+      * Gravity Modifier
+    - Shape module for emission shape
+    - Renderer module for material/sprite
+
+[ ] 11.2 - JUMP/LAND DUST EFFECT
+    - Create particle system
+    - Use dust sprite or generic circle
+    - Emit on jump and land
+    - Ground color-matched
+    - Burst emission (5-10 particles)
+    - Short lifetime (0.3-0.5s)
+    - Horizontal spread
+    - Create prefab in Assets/Prefabs/VFX/
+
+[ ] 11.3 - COLLECTIBLE SPARKLE
+    - Constant emission around collectibles
+    - Gold/colored sparkles
+    - Small size
+    - Float upward
+    - Additive material for glow
+
+[ ] 11.4 - DEATH EXPLOSION
+    - Burst emission (20-30 particles)
+    - Sprite or generic shapes
+    - Radial spread
+    - Fade out
+    - Scale animation
+    - Trigger on enemy/player death
+
+[ ] 11.5 - ENVIRONMENTAL PARTICLES
+    - Rain (falling particles)
+    - Snow (slow falling)
+    - Leaves (wind-affected)
+    - Fireflies (random movement)
+    - Fog (large, slow particles)
+    - Water splash (near water)
+    
+    Use sub-emitters for complex effects
+
+[ ] 11.6 - TRAIL RENDERERS
+    - Dash trail for fast movement
+    - Projectile trails
+    - Add Trail Renderer component
+    - Set time (0.1-0.3s)
+    - Color gradient (fade out)
+    - Width curve
+
+[ ] 11.7 - POST-PROCESSING EFFECTS
+    - Add Post-Processing package (if not in URP)
+    - Create Volume: GameObject > Volume > Global Volume
+    - Profile with effects:
+      * Bloom (for glows)
+      * Vignette (screen edges darken)
+      * Color Grading (mood adjustment)
+      * Chromatic Aberration (stylistic)
+      * Motion Blur (optional, not for mobile)
+    - Adjust per level or mood
+
+[ ] 11.8 - SCREEN TRANSITIONS
+    Create: Assets/Scripts/UI/ScreenTransition.cs
+    
+    - Fade to black
+    - Circular wipe
+    - Slide transition
+    - Use Animation or code with Canvas Group alpha
+    - Call before scene load
+
+[ ] 11.9 - HIT FLASH EFFECT
+    Create: Assets/Scripts/VFX/FlashEffect.cs
+    
+    - Attach to sprites that take damage
+    - Temporarily set sprite to white
+    - Lerp back to original color
+    - Duration: 0.1-0.2s
+    - Can use material property animation
+
+[ ] 11.10 - SPRITE DISSOLVE (Optional)
+    - Use shader for dissolve effect
+    - For enemy death or player respawn
+    - Animated noise threshold
+    - Edge glow color
+
+================================================================================
+                    PHASE 12: SAVE SYSTEM
+================================================================================
+
+[ ] 12.1 - SAVE DATA STRUCTURE
+    Create: Assets/Scripts/Managers/SaveData.cs
+    
+    [System.Serializable]
+    public class SaveData
+    {
+        // Player progress
+        public int currentLevel;
+        public int highScore;
+        public int totalCoins;
+        
+        // Level completion
+        public bool[] levelsUnlocked;
+        public int[] levelStars;
+        public float[] levelBestTimes;
+        
+        // Settings
+        public float masterVolume;
+        public float musicVolume;
+        public float sfxVolume;
+        public string language;
+        
+        // Player stats
+        public int totalDeaths;
+        public int totalEnemiesDefeated;
+        public float totalPlayTime;
+    }
+
+[ ] 12.2 - SAVE MANAGER
+    Create: Assets/Scripts/Managers/SaveManager.cs
+    
+    Methods:
+    - SaveGame(SaveData data)
+    - LoadGame() : SaveData
+    - DeleteSave()
+    - SaveExists() : bool
+    
+    Options:
+    A) PlayerPrefs (simple, limited)
+       - PlayerPrefs.SetInt/Float/String
+       - Easy but not for complex data
+    
+    B) JSON + File System (recommended)
+       - JsonUtility.ToJson(data)
+       - File.WriteAllText(path, json)
+       - Can encrypt for security
+    
+    C) Binary Serialization
+       - BinaryFormatter (more secure)
+       - Better performance
+
+[ ] 12.3 - AUTO-SAVE SYSTEM
+    - Save on checkpoint reached
+    - Save on level complete
+    - Save on app pause (OnApplicationPause on Android)
+    - Save settings immediately when changed
+
+[ ] 12.4 - CLOUD SAVE (Optional)
+    - Google Play Games Services (Android)
+    - Save to cloud for cross-device
+    - Requires Google Play plugin
+    - More complex implementation
+
+================================================================================
+                    PHASE 13: LOCALIZATION
+================================================================================
+
+[ ] 13.1 - INSTALL LOCALIZATION PACKAGE
+    - Window > Package Manager
+    - Search "Localization"
+    - Install "Localization" package
+    - Creates Localization Settings asset
+
+[ ] 13.2 - SETUP LOCALES
+    - Window > Asset Management > Localization Tables
+    - Create String Table Collection:
+      * Name: "UI_Strings"
+      * Add Locales: English, Spanish, French, etc.
+    - Create tables for:
+      * UI text
+      * Tutorial text
+      * Item descriptions
+      * Story/dialogue
+
+[ ] 13.3 - ADD TRANSLATIONS
+    - In Localization Tables window:
+      * Add keys (e.g., "MENU_PLAY", "MENU_SETTINGS")
+      * Enter translations for each locale
+    - Can export to CSV for translators
+    - Re-import after translation
+
+[ ] 13.4 - LOCALIZED TEXT COMPONENTS
+    - Add "Localize String Event" component to TextMeshPro
+    - Select String Table and Key
+    - Text updates automatically based on locale
+    - Can include variables (e.g., "Score: {0}")
+
+[ ] 13.5 - LOCALIZED AUDIO (Optional)
+    - Create Asset Table for audio
+    - Different voice-over per language
+    - Similar setup to string tables
+
+[ ] 13.6 - LOCALIZED SPRITES (Optional)
+    - For text in images (logos, signs)
+    - Asset table for sprites
+    - Swap based on locale
+
+[ ] 13.7 - LANGUAGE SELECTION
+    In SettingsMenu.cs:
+    - Dropdown with available languages
+    - LocalizationSettings.SelectedLocale = newLocale
+    - Save selection to PlayerPrefs
+    - Load saved language on game start
+
+[ ] 13.8 - RIGHT-TO-LEFT LANGUAGES (Optional)
+    - For Arabic, Hebrew, etc.
+    - Use TextMeshPro's RTL support
+    - Mirror UI layout
+    - More complex, implement if needed
+
+================================================================================
+                    PHASE 14: ANDROID OPTIMIZATION
+================================================================================
+
+[ ] 14.1 - GRAPHICS OPTIMIZATION
+    - Use sprite atlases to reduce draw calls:
+      * Select sprites > Create > 2D > Sprite Atlas
+      * Add sprites to atlas
+      * Unity batches them together
+    
+    - Limit screen resolutions:
+      * Edit > Project Settings > Player > Resolution
+      * Uncheck "Default Is Native Resolution"
+      * Set max resolution (1920x1080)
+    
+    - Reduce particles on mobile
+    - Simplify shaders (avoid complex post-processing)
+    - Use object pooling for frequent instantiation
+
+[ ] 14.2 - PHYSICS OPTIMIZATION
+    - Edit > Project Settings > Physics 2D
+    - Velocity Iterations: 6 (default 8)
+    - Position Iterations: 2 (default 3)
+    - Use Physics2D.IgnoreLayerCollision for unnecessary checks
+    - Minimize collision checks between certain layers
+
+[ ] 14.3 - MEMORY OPTIMIZATION
+    - Texture compression:
+      * Sprite Import Settings > Format: ASTC
+      * Max Size: 2048 or lower
+    - Audio compression:
+      * Music: Vorbis, Streaming
+      * SFX: ADPCM, Decompress On Load
+    - Unload unused assets:
+      * Resources.UnloadUnusedAssets()
+    - Don't use Resources folder (slow loading)
+
+[ ] 14.4 - FRAME RATE & VSYNC
+    - Application.targetFrameRate = 60;
+    - Can lower to 30 for low-end devices
+    - QualitySettings.vSyncCount = 0; (for mobile)
+    - Manage in quality settings per device tier
+
+[ ] 14.5 - PROFILING
+    - Window > Analysis > Profiler
+    - Test on Android device (USB debugging)
+    - Check:
+      * CPU usage (scripts, rendering, physics)
+      * Memory usage (textures, audio, meshes)
+      * Rendering (draw calls, batches)
+    - Optimize bottlenecks
+
+[ ] 14.6 - BATTERY OPTIMIZATION
+    - Reduce unnecessary calculations
+    - Lower particle counts
+    - Optimize update loops (use FixedUpdate appropriately)
+    - Pause game when app is backgrounded
+
+[ ] 14.7 - BUILD SIZE REDUCTION
+    - Enable "Managed Stripping Level" in Player Settings
+    - Compress assets
+    - Use Android App Bundle (.aab) instead of APK
+    - Remove unused packages
+    - IL2CPP backend (smaller than Mono)
+
+[ ] 14.8 - MULTI-RESOLUTION SUPPORT
+    - Test on various screen ratios (16:9, 18:9, 19.5:9)
+    - Use anchors in UI for different screens
+    - Camera orthographic size adjustment
+    - Safe area for notched devices
+
+================================================================================
+                    PHASE 15: ANALYTICS
+================================================================================
+
+[ ] 15.1 - UNITY ANALYTICS SETUP
+    - Window > General > Services
+    - Create Unity ID / Link project
+    - Enable Analytics
+    - Free tier: 100k events/month
+
+[ ] 15.2 - ANALYTICS IMPLEMENTATION
+    Create: Assets/Scripts/Analytics/AnalyticsManager.cs
+    
+    Import: Unity.Services.Analytics
+    
+    Track events:
+    - Level start
+    - Level complete
+    - Level failed
+    - Player death (with cause)
+    - Tutorial completion
+    - Collectibles gathered
+    - Settings changed
+    - IAP attempts/completions
+    
+    Example:
+    AnalyticsService.Instance.CustomData("levelComplete", new Dictionary<string, object>
+    {
+        {"levelName", levelName},
+        {"completionTime", time},
+        {"deaths", deaths}
+    });
+
+[ ] 15.3 - FUNNELS & RETENTION
+    - Track player progression through levels
+    - Identify where players quit
+    - Analyze difficulty spikes
+    - Optimize based on data
+
+[ ] 15.4 - A/B TESTING (Optional)
+    - Test different game parameters
+    - Different UI layouts
+    - Different monetization strategies
+    - Remote Config for dynamic changes
+
+[ ] 15.5 - GDPR COMPLIANCE
+    - Ask for analytics consent (EU)
+    - Provide opt-out option in settings
+    - Privacy policy link
+    - Don't collect personal data without consent
+
+================================================================================
+                    PHASE 16: ADVERTISEMENT
+================================================================================
+
+[ ] 16.1 - UNITY ADS SETUP
+    - Window > General > Services
+    - Enable Ads
+    - Choose ad provider (Unity Ads, AdMob, IronSource)
+    - Get Game ID from dashboard
+
+[ ] 16.2 - IMPORT ADS SDK
+    - Unity Ads:
+      * Window > Package Manager > Unity Ads
+      * Install
+    
+    - AdMob (alternative):
+      * Download Google Mobile Ads SDK
+      * Import into project
+      * More complex setup
+
+[ ] 16.3 - ADS MANAGER
+    Create: Assets/Scripts/Ads/AdsManager.cs
+    
+    Methods:
+    - Initialize()
+    - ShowInterstitialAd() (between levels)
+    - ShowRewardedAd(Action onComplete) (for rewards)
+    - ShowBannerAd()
+    - HideBannerAd()
+    
+    Callbacks:
+    - OnAdLoaded
+    - OnAdFailed
+    - OnAdCompleted
+    - OnAdSkipped
+
+[ ] 16.4 - INTERSTITIAL ADS
+    - Show between level transitions
+    - Don't show too frequently (every 3-5 levels)
+    - Track time since last ad
+    - Don't interrupt gameplay
+
+[ ] 16.5 - REWARDED ADS
+    - Offer player choice to watch ad for:
+      * Extra life
+      * Continue from death
+      * Bonus coins
+      * Power-up
+    - Button in Game Over screen
+    - Button in shop (optional)
+    - Must complete ad to get reward
+
+[ ] 16.6 - BANNER ADS (Optional)
+    - Small ad at top or bottom of screen
+    - Persistent in menus
+    - Hide during gameplay (affects visibility)
+    - Lower revenue but always visible
+
+[ ] 16.7 - AD FREQUENCY BALANCING
+    - Too many ads = bad user experience
+    - Too few ads = low revenue
+    - Test different frequencies
+    - Consider removing ads for IAP
+
+[ ] 16.8 - AD-FREE OPTION (IAP)
+    - In-app purchase to remove ads
+    - Boolean flag: "hasRemovedAds"
+    - Save to PlayerPrefs
+    - Check before showing ads
+
+================================================================================
+                    PHASE 17: IN-APP PURCHASES (IAP)
+================================================================================
+
+[ ] 17.1 - UNITY IAP SETUP
+    - Window > Package Manager
+    - Install "In-App Purchasing"
+    - Window > General > Services > In-App Purchasing
+    - Enable
+
+[ ] 17.2 - IAP CATALOG SETUP
+    - Services window > In-App Purchasing > IAP Catalog
+    - Add products:
+      * Remove Ads (Non-Consumable) - $2.99
+      * Coin Pack Small (Consumable) - $0.99
+      * Coin Pack Medium (Consumable) - $4.99
+      * Coin Pack Large (Consumable) - $9.99
+      * Premium Skin Pack (Non-Consumable) - $3.99
+    - Note Product IDs for code
+
+[ ] 17.3 - IAP MANAGER
+    Create: Assets/Scripts/IAP/IAPManager.cs
+    
+    Implement IStoreListener
+    
+    Methods:
+    - InitializePurchasing()
+    - BuyProductID(string productID)
+    - RestorePurchases() (iOS requirement)
+    - ProcessPurchase(PurchaseEventArgs args)
+    - OnPurchaseFailed(Product product, PurchaseFailureReason reason)
+
+[ ] 17.4 - SHOP UI
+    - Create shop scene or panel
+    - Display IAP products with:
+      * Icon
+      * Name
+      * Description
+      * Price (from store)
+      * Buy button
+    - OnClick: Call IAPManager.BuyProductID()
+
+[ ] 17.5 - PURCHASE PROCESSING
+    In ProcessPurchase():
+    - Check product ID
+    - Award item to player:
+      * Add coins
+      * Unlock skin
+      * Remove ads flag
+    - Save to PlayerPrefs/SaveData
+    - Show confirmation message
+    - Update UI
+
+[ ] 17.6 - GOOGLE PLAY CONSOLE SETUP
+    - Create app in Google Play Console
+    - Add in-app products with same IDs
+    - Set prices per region
+    - Test with license testers (your Google account)
+    - Can't test IAP without uploading to Play Console
+
+[ ] 17.7 - RECEIPT VALIDATION (Security)
+    - Optional but recommended
+    - Server-side validation of purchases
+    - Prevents piracy/hacking
+    - Unity IAP has built-in validation
+    - Enable in IAP settings
+
+[ ] 17.8 - IAP TESTING
+    - Use test accounts in Google Play Console
+    - Test purchases don't charge real money
+    - Test all product types
+    - Test failure scenarios (no connection, cancelled)
+
+================================================================================
+                    PHASE 18: CINEMATICS & CUTSCENES
+================================================================================
+
+[ ] 18.1 - TIMELINE SETUP
+    - Window > Sequencing > Timeline
+    - Create Timeline Asset in Assets/Scenes/Cinematics/
+    - Create empty GameObject: "CutsceneDirector"
+    - Add Playable Director component
+    - Assign Timeline asset
+
+[ ] 18.2 - CINEMATIC CAMERA
+    - Create virtual camera for cutscene
+    - Add to Timeline as Cinemachine Track
+    - Can blend between multiple cameras
+    - Control camera position/rotation over time
+
+[ ] 18.3 - CHARACTER ANIMATION IN TIMELINE
+    - Add Animation Track for characters
+    - Record or add animation clips
+    - Tween positions for movement
+    - Synchronize with dialogue
+
+[ ] 18.4 - DIALOGUE SYSTEM
+    Create: Assets/Scripts/UI/DialogueManager.cs
+    
+    - Text box UI panel
+    - Character name
+    - Portrait image
+    - Dialogue text (typewriter effect)
+    - Continue button or auto-advance
+    - Option for voice-over audio
+    
+    Data structure:
+    [System.Serializable]
+    public class DialogueLine
+    {
+        public string characterName;
+        public Sprite portrait;
+        public string text;
+        public AudioClip voiceClip;
+    }
+
+[ ] 18.5 - SUBTITLE SYSTEM
+    - Synced with voice-over
+    - Localized text
+    - Adjustable speed
+    - Can skip with input
+
+[ ] 18.6 - TIMELINE SIGNALS
+    - Signal Emitter for events during timeline
+    - Trigger game events:
+      * Play sound
+      * Spawn object
+      * Enable/disable UI
+      * Load next scene
+    - Create Signal Receiver on GameObjects
+
+[ ] 18.7 - SKIPPABLE CUTSCENES
+    - Input to skip (any button)
+    - Fast-forward to end of timeline
+    - Or jump to specific marker
+    - Save "has watched" flag to skip on replay
+
+[ ] 18.8 - INTRO CUTSCENE
+    - Game story introduction
+    - Play on first launch or new game
+    - Can be skipped after first viewing
+    - Transition to main menu or level 1
+
+[ ] 18.9 - LEVEL INTRO/OUTRO
+    - Short sequences between levels
+    - Story progression
+    - Can be simple text cards
+    - Or animated sequences
+
+================================================================================
+                    PHASE 19: GAME PROGRESSION & POLISH
+================================================================================
+
+[ ] 19.1 - LEVEL PROGRESSION SYSTEM
+    Create: Assets/Scripts/Managers/LevelManager.cs
+    
+    - Track current level
+    - Load next level on completion
+    - Unlock next level
+    - Persistent level state (completed, stars, time)
+    - Level selection validation
+
+[ ] 19.2 - DIFFICULTY CURVE
+    Design levels with increasing difficulty:
+    - Level 1-3: Tutorial, basic mechanics
+    - Level 4-6: Introduce enemies
+    - Level 7-9: Complex platforming
+    - Level 10-12: Combine all mechanics
+    - Boss levels: Every 5th or 10th level
+    
+    Variables to increase:
+    - Enemy count
+    - Hazard density
+    - Platform spacing
+    - Required precision
+
+[ ] 19.3 - STAR RATING SYSTEM
+    Criteria for stars:
+    - 1 star: Complete level
+    - 2 stars: Collect 50% of items
+    - 3 stars: Collect 100% + fast time
+    
+    Calculate on level complete:
+    - Check time vs par time
+    - Check collectibles collected
+    - Award stars
+    - Save to SaveData
+
+[ ] 19.4 - ACHIEVEMENT SYSTEM (Optional)
+    Create: Assets/Scripts/Managers/AchievementManager.cs
+    
+    Achievements:
+    - Complete first level
+    - Collect 100 coins
+    - Defeat 50 enemies
+    - Complete game without dying
+    - Find all secrets
+    - Speed run achievements
+    
+    UI:
+    - Achievement pop-up notification
+    - Achievement list in menu
+    - Progress tracking
+
+[ ] 19.5 - LEADERBOARDS (Optional)
+    - Google Play Games Services
+    - Track:
+      * Highest score
+      * Fastest level times
+      * Most coins collected
+    - Display in-game
+    - Social competition
+
+[ ] 19.6 - DAILY CHALLENGES (Optional)
+    - Special level or objective each day
+    - Reward coins or items
+    - Increases retention
+    - Can be procedurally generated
+
+[ ] 19.7 - JUICE & GAME FEEL
+    Enhance player experience:
+    - Screen shake on impacts
+    - Slow motion on special events
+    - Particle effects on all actions
+    - Sound feedback for everything
+    - Smooth animations (easing)
+    - Responsive controls (low input latency)
+    - Camera anticipation
+    - Hitstop on impacts
+
+[ ] 19.8 - ACCESSIBILITY OPTIONS
+    - Colorblind modes
+    - Adjustable text size
+    - Reduced motion option
+    - Button remapping
+    - Difficulty settings
+    - Subtitle options
+
+[ ] 19.9 - SECRETS & COLLECTIBLES
+    - Hidden areas in levels
+    - Secret exits
+    - Special collectibles
+    - Unlockable characters/skins
+    - Encourages exploration
+    - Adds replayability
+
+[ ] 19.10 - PLAYTESTING & ITERATION
+    - Test with friends/family
+    - Watch them play (don't guide)
+    - Note where they struggle
+    - Note where they lose interest
+    - Gather feedback
+    - Iterate on design
+    - Balance difficulty
+    - Fix confusing elements
+
+================================================================================
+                    PHASE 20: BUILD & DEPLOYMENT
+================================================================================
+
+[ ] 20.1 - ANDROID BUILD SETTINGS
+    File > Build Settings:
+    - Platform: Android
+    - Click "Switch Platform" if not already
+    - Add all scenes to build (in order):
+      * Main Menu
+      * Levels (1-X)
+      * Cinematics
+    - Texture Compression: ASTC
+    - ETC2 Fallback: 32-bit
+
+[ ] 20.2 - PLAYER SETTINGS (Android)
+    Edit > Project Settings > Player > Android:
+    
+    COMPANY & PRODUCT:
+    - Company Name: Your name
+    - Product Name: A Pedestrian's Journey
+    
+    ICON:
+    - Default Icon: Your game icon (512x512)
+    - Override for Android
+    - Provide all sizes (432x432, 324x324, etc.)
+    
+    RESOLUTION:
+    - Default Orientation: Landscape Left
+    - Or Auto Rotation if supporting portrait
+    
+    OTHER SETTINGS:
+    - Graphics APIs: OpenGLES3, Vulkan (auto)
+    - Scripting Backend: IL2CPP (recommended)
+    - Target Architectures: ARMv7, ARM64
+    - Install Location: Automatic
+    - Internet Access: Require (for ads/IAP)
+    
+    IDENTIFICATION:
+    - Package Name: com.YourName.APedestriansJourney
+    - Version: 1.0
+    - Bundle Version Code: 1 (increment for each release)
+    - Minimum API Level: 21 (Android 5.0)
+    - Target API Level: Latest available
+    
+    CONFIGURATION:
+    - Scripting Define Symbols: (empty or custom)
+    - Managed Stripping Level: Medium
+    
+    PUBLISHING SETTINGS:
+    - Create new keystore (for release build)
+    - Keystore password (save securely!)
+    - Key alias
+    - Key password
+    - IMPORTANT: Never lose keystore or you can't update app!
+
+[ ] 20.3 - KEYSTORE CREATION
+    - Publishing Settings > Keystore Manager
+    - "Keystore..." > "Create New" > "Anywhere"
+    - Choose location and password
+    - Create new key
+    - Enter all information
+    - BACKUP THIS FILE SECURELY
+
+[ ] 20.4 - BUILD APK (for testing)
+    - File > Build Settings
+    - Build App Bundle (Google Play): OFF
+    - Build: Choose location
+    - Wait for build to complete
+    - Install on Android device for testing
+    - Test all features (IAP requires Play Console)
+
+[ ] 20.5 - BUILD AAB (for Play Store)
+    - File > Build Settings
+    - Build App Bundle (Google Play): ON
+    - Build: Choose location
+    - Creates .aab file
+    - Smaller download for users
+    - Required by Google Play since 2021
+
+[ ] 20.6 - TESTING ON DEVICE
+    - Enable Developer Options on Android device
+    - Enable USB Debugging
+    - Connect device via USB
+    - File > Build And Run
+    - Or install APK manually
+    - Test:
+      * Performance
+      * Touch controls
+      * All features
+      * Different screen sizes
+      * Battery usage
+
+[ ] 20.7 - GOOGLE PLAY CONSOLE SETUP
+    - Go to play.google.com/console
+    - Create Developer Account ($25 one-time fee)
+    - Create New App
+    - Fill out store listing:
+      * Title
+      * Short description (80 chars)
+      * Full description (4000 chars)
+      * Screenshots (at least 2)
+      * Feature graphic (1024x500)
+      * App icon (512x512)
+      * Categories
+      * Tags
+      * Contact details
+      * Privacy policy URL (required)
+
+[ ] 20.8 - UPLOAD TO PLAY CONSOLE
+    - Release > Production (or Internal Testing first)
+    - Create New Release
+    - Upload AAB file
+    - Release notes (what's new)
+    - Review and rollout
+    - Can start with Internal Testing (up to 100 testers)
+    - Then Closed Testing (alpha)
+    - Then Open Testing (beta)
+    - Finally Production
+
+[ ] 20.9 - APP REVIEW PROCESS
+    - Google reviews your app
+    - Usually takes 1-7 days
+    - Check for policy violations
+    - Ensure:
+      * No copyrighted content
+      * Privacy policy exists
+      * Content rating accurate
+      * Permissions justified
+    - Fix any issues and resubmit
+
+[ ] 20.10 - POST-LAUNCH
+    - Monitor crash reports (Play Console)
+    - Read user reviews
+    - Respond to feedback
+    - Plan updates:
+      * Bug fixes
+      * New levels
+      * New features
+      * Balance changes
+    - Increment version number for each update
+    - Maintain regular update schedule
+    - Marketing:
+      * Social media
+      * Game dev communities
+      * Press releases (if notable)
+
+================================================================================
+                    PHASE 21: ADVANCED FEATURES (Optional)
+================================================================================
+
+[ ] 21.1 - BOSS BATTLES
+    - Unique enemy with multiple phases
+    - Attack patterns
+    - Health bar UI
+    - Arena design
+    - Epic music
+    - Reward on defeat
+
+[ ] 21.2 - CHARACTER SKINS/CUSTOMIZATION
+    - Unlockable player skins
+    - Change sprite sheets
+    - Store system to purchase with coins
+    - Or IAP for premium skins
+
+[ ] 21.3 - PROCEDURAL GENERATION
+    - Randomly generated levels
+    - Endless mode
+    - Tile-based generation algorithms
+    - Ensures playability
+    - Seed-based for sharing levels
+
+[ ] 21.4 - MULTIPLAYER (Complex)
+    - Local co-op (split screen or shared screen)
+    - Or online multiplayer (Unity Netcode)
+    - Race mode
+    - Cooperative gameplay
+    - Very complex for mobile
+
+[ ] 21.5 - LEVEL EDITOR
+    - In-game level creation
+    - Place tiles and objects
+    - Save/load custom levels
+    - Share with community (requires server)
+    - Very complex feature
+
+[ ] 21.6 - WEATHER SYSTEM
+    - Rain, snow, fog effects
+    - Affects gameplay (slippery platforms)
+    - Dynamic lighting changes
+    - Particle-based
+
+[ ] 21.7 - DAY/NIGHT CYCLE
+    - Time-based lighting changes
+    - Different enemies at night
+    - Visual variety
+    - Can be per-level or global
+
+[ ] 21.8 - STORY MODE
+    - Narrative-driven gameplay
+    - Dialogue between levels
+    - Character development
+    - Multiple endings
+
+[ ] 21.9 - CHALLENGE MODE
+    - Time trials
+    - No-death runs
+    - Speedrun mode
+    - Minimal collectibles run
+    - Separate leaderboards
+
+[ ] 21.10 - SOCIAL FEATURES
+    - Share screenshots
+    - Friend invites
+    - Co-op challenges
+    - Social media integration
+
+================================================================================
+                    TROUBLESHOOTING & COMMON ISSUES
+================================================================================
+
+ISSUE: Player falls through ground
+SOLUTION: 
+- Check collision matrix (Physics 2D settings)
+- Ensure Ground layer collides with Player layer
+- Set Rigidbody2D collision detection to Continuous
+- Check that colliders are properly sized
+
+ISSUE: Choppy movement
+SOLUTION:
+- Move physics-based movement to FixedUpdate()
+- Camera follow in LateUpdate()
+- Check target frame rate
+- Profile for performance issues
+
+ISSUE: Jump feels floaty or too heavy
+SOLUTION:
+- Adjust Rigidbody2D Gravity Scale
+- Modify jump force
+- Add jump curve (stronger at start, weaker at peak)
+- Implement variable jump height
+
+ISSUE: Player sticks to walls when sliding
+SOLUTION:
+- Create Physics Material 2D with zero friction
+- Apply to player collider
+- Or use raycasts to detect wall and disable friction
+
+ISSUE: Animation transitions are too fast/slow
+SOLUTION:
+- Adjust transition duration in Animator
+- Add exit time conditions
+- Use blend trees for smoother transitions
+
+ISSUE: UI doesn't scale on different devices
+SOLUTION:
+- Use Canvas Scaler with "Scale With Screen Size"
+- Use anchors and pivots correctly
+- Test on multiple resolutions in Game view
+
+ISSUE: Audio doesn't play
+SOLUTION:
+- Check AudioSource component is attached
+- Check volume levels (not muted)
+- Check Audio Mixer routing
+- Ensure clip is assigned
+
+ISSUE: Build fails
+SOLUTION:
+- Check Console for errors
+- Fix all compiler errors
+- Check Android SDK/NDK paths in Preferences
+- Update Unity or build tools
+
+ISSUE: APK won't install on device
+SOLUTION:
+- Enable "Install from Unknown Sources" on device
+- Check if app is already installed (uninstall first)
+- Check minimum API level compatibility
+- Look for install errors in logcat
+
+ISSUE: Ads/IAP not working
+SOLUTION:
+- Test IAP only works on Play Console builds
+- Check internet connection
+- Verify Game IDs are correct
+- Check callbacks for error messages
+- Use test ads during development
+
+ISSUE: Game crashes on startup (Android)
+SOLUTION:
+- Check logcat for stack trace
+- Missing permissions in manifest
+- Graphics API compatibility
+- Reduce quality settings for device
+
+================================================================================
+                    RESOURCES & LEARNING MATERIALS
+================================================================================
+
+UNITY DOCUMENTATION:
+- docs.unity3d.com
+- Unity Learn (learn.unity.com)
+- Unity Forum (forum.unity.com)
+
+2D GAME DEVELOPMENT:
+- Brackeys YouTube (classic tutorials)
+- Unity 2D Platformer Tutorial (official)
+- 2D Game Kit (free asset package)
+
+ART RESOURCES:
+- OpenGameArt.org (free sprites)
+- itch.io (free and paid assets)
+- Kenney.nl (free game assets)
+- CraftPix.net (premium assets)
+
+AUDIO RESOURCES:
+- Freesound.org (free SFX)
+- Incompetech.com (free music, Kevin MacLeod)
+- Purple Planet Music (free music)
+- BFXR/SFXR (generate SFX)
+
+SHADERS & VFX:
+- Shader Graph tutorials (Unity)
+- VFX Graph tutorials (Unity)
+- Brackeys shader tutorials
+
+ANDROID DEVELOPMENT:
+- Unity Android documentation
+- Google Play Console help
+- Android developer guides
+
+GAME DESIGN:
+- Game Maker's Toolkit (YouTube)
+- Extra Credits (YouTube)
+- The Art of Game Design book
+
+COMMUNITIES:
+- r/Unity2D (Reddit)
+- r/gamedev (Reddit)
+- Unity Discord servers
+- Game Dev League Discord
+
+================================================================================
+                    FINAL CHECKLIST BEFORE RELEASE
+================================================================================
+
+[ ] All critical bugs fixed
+[ ] Tested on multiple Android devices (low to high-end)
+[ ] All levels are completable
+[ ] No placeholder art or audio
+[ ] UI is readable on all screen sizes
+[ ] Touch controls are responsive
+[ ] Save system works correctly
+[ ] Ads are displaying correctly (if implemented)
+[ ] IAP products are purchasable (if implemented)
+[ ] Analytics is tracking events
+[ ] Localization is correct (no missing translations)
+[ ] Privacy policy is written and linked
+[ ] App icon and screenshots are finalized
+[ ] Store description is compelling
+[ ] Age rating is appropriate (ESRB, PEGI)
+[ ] APK size is reasonable (<100MB ideally)
+[ ] No excessive permissions requested
+[ ] Tested on different Android versions
+[ ] Loading times are acceptable
+[ ] Battery usage is reasonable
+[ ] No crashes in extended play session
+[ ] Achievement system works (if implemented)
+[ ] Leaderboards update correctly (if implemented)
+[ ] All legal requirements met (trademarks, copyrights)
+[ ] Credits screen with attributions
+[ ] Version number is set correctly
+[ ] Keystore is backed up securely
+
+================================================================================
+                    PROJECT COMPLETION NOTES
+================================================================================
+
+This game plan covers the complete development of "A Pedestrian's Journey"
+from initial Unity setup to Google Play Store deployment.
+
+IMPORTANT REMINDERS:
+
+1. SAVE OFTEN: Use version control (Git) or manual backups
+2. TEST FREQUENTLY: Test on actual Android device regularly
+3. ITERATE: Game development is iterative, don't aim for perfection on first pass
+4. SCOPE: Start with core mechanics, add features incrementally
+5. FEEDBACK: Get feedback early and often
+6. PERFORMANCE: Profile regularly, optimize as needed
+7. LEARNING: Use documentation and tutorials when stuck
+8. POLISH: Small details make big difference in game feel
+9. BACKUP KEYSTORE: Losing it means you can't update your app!
+10. HAVE FUN: You're creating something awesome!
+
+ESTIMATED TIMELINE (Solo Developer):
+- Phases 1-3 (Setup & Core Mechanics): 2-3 weeks
+- Phases 4-6 (Levels & Visuals): 3-4 weeks
+- Phases 7-8 (Enemies & Combat): 2-3 weeks
+- Phases 9-11 (UI, Audio, VFX): 2-3 weeks
+- Phases 12-19 (Systems & Polish): 4-6 weeks
+- Phase 20 (Build & Deploy): 1 week
+- Phase 21 (Optional Features): Variable
+
+TOTAL: Approximately 3-6 months depending on scope and experience
+
+Remember: This is a living document. Feel free to:
+- Add new tasks as you discover needs
+- Reorder based on your priorities
+- Skip features that don't fit your vision
+- Expand sections that need more detail
+
+Good luck with "A Pedestrian's Journey"! 🎮
+
+================================================================================
+                    END OF GAME PLAN
+================================================================================

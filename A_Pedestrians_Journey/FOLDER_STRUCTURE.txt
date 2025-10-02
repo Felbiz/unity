@@ -1,0 +1,218 @@
+================================================================================
+                A PEDESTRIAN'S JOURNEY - FOLDER STRUCTURE
+================================================================================
+
+A_Pedestrians_Journey/
+│
+├── Assets/
+│   │
+│   ├── Animations/
+│   │   ├── Player/              (Player animation controllers and clips)
+│   │   ├── Enemies/             (Enemy animation controllers and clips)
+│   │   ├── Environment/         (Animated environment objects)
+│   │   └── UI/                  (UI animations and transitions)
+│   │
+│   ├── Art/
+│   │   ├── Animations/          (Raw animation sprite sequences)
+│   │   ├── Characters/
+│   │   │   ├── Player/          (Player sprite sheets)
+│   │   │   ├── Enemies/         (Enemy sprite sheets)
+│   │   │   └── NPCs/            (Non-playable character sprites)
+│   │   ├── Environments/
+│   │   │   ├── Backgrounds/     (Far background images)
+│   │   │   ├── Foregrounds/     (Front overlay images)
+│   │   │   ├── Midgrounds/      (Middle layer images)
+│   │   │   ├── Parallax_Layers/ (Layers for parallax effect)
+│   │   │   └── Props/           (Decorative objects: trees, rocks, etc.)
+│   │   ├── UI/
+│   │   │   ├── Buttons/         (Button sprites and states)
+│   │   │   ├── Icons/           (UI icons and symbols)
+│   │   │   ├── Panels/          (Menu panels and windows)
+│   │   │   └── HUD/             (Health bars, score displays, etc.)
+│   │   └── VFX/
+│   │       ├── Particles/       (Particle sprites)
+│   │       └── Sprites/         (Effect sprites: explosions, etc.)
+│   │
+│   ├── Audio/
+│   │   ├── Music/
+│   │   │   ├── Menu/            (Main menu music)
+│   │   │   ├── Gameplay/        (Level background music)
+│   │   │   └── Cinematics/      (Cutscene music)
+│   │   ├── SFX/
+│   │   │   ├── Player/          (Jump, land, attack sounds)
+│   │   │   ├── Enemies/         (Enemy sounds)
+│   │   │   ├── Environment/     (Ambient sounds, doors, etc.)
+│   │   │   └── UI/              (Button clicks, menu sounds)
+│   │   └── Voice/               (Voice-over files, if any)
+│   │
+│   ├── Data/
+│   │   ├── LevelData/           (ScriptableObjects for level configs)
+│   │   ├── EnemyData/           (Enemy stats and configurations)
+│   │   ├── CollectibleData/     (Collectible properties)
+│   │   └── PlayerData/          (Player stats and abilities)
+│   │
+│   ├── Lighting/
+│   │   ├── 2D_Lights/           (Light prefabs and configurations)
+│   │   └── Light_Presets/       (Lighting presets: day, night, etc.)
+│   │
+│   ├── Localization/
+│   │   ├── Languages/           (Translation files for each language)
+│   │   └── Fonts/               (Language-specific fonts)
+│   │
+│   ├── Materials/
+│   │   ├── Sprites/             (Materials for sprites)
+│   │   └── Lighting/            (Materials for lighting effects)
+│   │
+│   ├── Plugins/
+│   │   ├── Android/             (Android-specific plugins)
+│   │   ├── Analytics/           (Analytics SDK files)
+│   │   ├── Ads/                 (Ad network SDK files)
+│   │   └── IAP/                 (In-app purchase plugins)
+│   │
+│   ├── Prefabs/
+│   │   ├── Player/              (Player prefab and variants)
+│   │   ├── Enemies/             (Enemy prefabs)
+│   │   ├── Environment/         (Platforms, hazards, props)
+│   │   ├── UI/                  (UI element prefabs)
+│   │   ├── Collectibles/        (Coins, gems, power-ups)
+│   │   └── VFX/                 (Particle systems and effects)
+│   │
+│   ├── Scenes/
+│   │   ├── MainMenu/            (Main menu scene)
+│   │   ├── Levels/              (All game levels)
+│   │   ├── Cinematics/          (Cutscene scenes)
+│   │   └── TestScenes/          (Testing and prototyping scenes)
+│   │
+│   ├── Scripts/
+│   │   ├── Player/              (Player controller, combat, health)
+│   │   ├── Enemies/             (Enemy AI and behaviors)
+│   │   ├── Managers/            (Game, audio, level managers)
+│   │   ├── UI/                  (Menu systems, HUD scripts)
+│   │   ├── Camera/              (Camera follow, shake, parallax)
+│   │   ├── Level/               (Level mechanics, checkpoints)
+│   │   ├── Collectibles/        (Collectible logic)
+│   │   ├── Analytics/           (Analytics tracking)
+│   │   ├── Ads/                 (Ad implementation scripts)
+│   │   ├── IAP/                 (In-app purchase scripts)
+│   │   └── Localization/        (Localization helper scripts)
+│   │
+│   └── ThirdParty/
+│       └── AssetStore/          (Assets downloaded from Unity Asset Store)
+│
+├── ProjectSettings/             (Unity project settings - auto-generated)
+│
+└── Documentation/               (Design docs, notes, references)
+    ├── GameDesignDocument.txt   (Optional: Game design documentation)
+    ├── ArtStyleGuide.txt        (Optional: Art style reference)
+    └── TechnicalNotes.txt       (Optional: Technical implementation notes)
+
+================================================================================
+                            FOLDER USAGE GUIDE
+================================================================================
+
+HOW TO USE THIS STRUCTURE WITH UNITY:
+
+1. IMPORTING INTO UNITY:
+   - Create a new Unity project (2D URP template recommended)
+   - Copy this "A_Pedestrians_Journey" folder into your Unity Projects directory
+   - Or create the project, then organize assets into these folders as you work
+
+2. UNITY WILL AUTO-GENERATE:
+   - Library/ (cache and build data - not included here, don't commit to Git)
+   - Logs/ (Unity logs)
+   - Packages/ (package manifest)
+   - Temp/ (temporary files)
+   - UserSettings/ (local user settings)
+
+3. ADDING NEW FOLDERS:
+   - Right-click in Unity Project window > Create > Folder
+   - Or create directly in file system and Unity will import
+   - This structure is flexible - add folders as needed!
+
+4. KEEPING ORGANIZED:
+   - Always save assets in appropriate folders
+   - Use prefixes for easy sorting (e.g., "Player_", "Enemy_", "UI_")
+   - Create subfolders when a category gets too large
+   - Delete unused assets regularly to keep project clean
+
+5. VERSION CONTROL (Git):
+   If using Git, your .gitignore should include:
+   - Library/
+   - Temp/
+   - Logs/
+   - UserSettings/
+   - *.csproj
+   - *.sln
+   - .vs/
+   - .vscode/
+
+6. ASSET NAMING CONVENTIONS (Recommended):
+   - Use PascalCase or snake_case consistently
+   - Be descriptive: "Player_Jump_SFX.wav" not "sound1.wav"
+   - Include asset type: "Enemy_Slime_Sprite", "UI_Button_Play"
+   - Version if iterating: "Level_01_v2.unity"
+
+7. BACKUP STRATEGY:
+   - Regularly backup the entire project folder
+   - Use cloud storage (Google Drive, Dropbox, OneDrive)
+   - Or use version control (Git + GitHub/GitLab)
+   - CRITICAL: Backup your Android keystore file securely!
+
+================================================================================
+                            QUICK REFERENCE
+================================================================================
+
+WHERE TO PUT:
+
+✓ Character sprites → Assets/Art/Characters/
+✓ Character scripts → Assets/Scripts/Player/ or /Enemies/
+✓ Character animations → Assets/Animations/Player/ or /Enemies/
+✓ Background images → Assets/Art/Environments/Backgrounds/
+✓ Level scenes → Assets/Scenes/Levels/
+✓ Sound effects → Assets/Audio/SFX/
+✓ Music tracks → Assets/Audio/Music/
+✓ UI buttons → Assets/Art/UI/Buttons/
+✓ Particle effects → Assets/Prefabs/VFX/
+✓ Manager scripts → Assets/Scripts/Managers/
+✓ Platform/hazard prefabs → Assets/Prefabs/Environment/
+✓ Collectible prefabs → Assets/Prefabs/Collectibles/
+✓ 2D lights → Assets/Lighting/2D_Lights/
+✓ Translation files → Assets/Localization/Languages/
+✓ Level data → Assets/Data/LevelData/
+✓ Asset Store packages → Assets/ThirdParty/AssetStore/
+
+================================================================================
+                            TIPS & BEST PRACTICES
+================================================================================
+
+1. Don't put everything in root Assets folder - it gets messy fast!
+2. Group related assets together (sprite + animation + prefab)
+3. Use assembly definitions for faster compile times (advanced)
+4. Keep test assets in TestScenes folder, delete before final build
+5. Compress textures appropriately (sprite atlases for performance)
+6. Use prefab variants for similar objects with slight differences
+7. Name things clearly so you can find them 6 months later
+8. Document your code with comments
+9. Create prefabs early and often - easier to manage
+10. If a folder is empty, Unity won't show it - add a .gitkeep if using Git
+
+================================================================================
+                    EXPANDABILITY & FUTURE-PROOFING
+================================================================================
+
+This structure can easily accommodate:
+
+✓ Multiple worlds/chapters (create subfolders in Levels/)
+✓ DLC content (add DLC/ folder in Assets/)
+✓ Multiplayer (add Networking/ folder in Scripts/)
+✓ Level editor (add Editor/ folder)
+✓ Mini-games (add separate folders in Scenes/ and Scripts/)
+✓ Character abilities/upgrades (expand Data/ folder)
+✓ Boss battles (add Bosses/ to Characters/ and Scripts/)
+✓ Weapons system (add Weapons/ to Prefabs/ and Scripts/)
+✓ Quest system (add Quests/ to Data/ and Scripts/)
+✓ Inventory system (add Inventory/ to Scripts/ and UI/)
+
+Simply create new subfolders following the same organizational pattern!
+
+================================================================================
